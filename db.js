@@ -19,20 +19,20 @@ Page.belongsTo(Page, {as: 'parent'});
 Page.hasMany(Page, {foreignKey: 'parent'});
 
 
-Page.findHomePage = function()  {
-  return this.findAll({ where: {parentId: null} })
-      .then(pages => pages.map(page => page.title).toString())
+Page.findHomePage = function(){
+  return this.findAll({ where: {parentId: null} }).filter(pages => pages.map(page => page.title).toString())
 }
 
-Page.prototype.findChildren = function (){
-  return Page.findAll()
-            .then(pages => pages.filter(page => this.id === page.parentId))
-            .then(children => children.map(child => child.title))
-}
+Page.prototype.findChildren = function(){
+  return Page.findAll().filter(pages => {
+    const current = pages.filter(page => this.id === page.parentId)
+    current.map(child => child.title)
+})
+};
+
 
 Page.prototype.hierarchy = function (){
- return Page.findAll()
-          .then(pages => {
+ return Page.findAll().filter(pages => {
             const parent = pages.find(page => page.id === this.parentId);
             const result = [this.title, parent.title]
             const nextParent = pages.find(page => page.id === parent.parentId)
